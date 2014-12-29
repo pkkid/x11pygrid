@@ -20,10 +20,10 @@ except ImportError:
 centered = lambda a,b: a == round(1.0-b, 2)
 XDIVS = [0.0, 0.33, 0.5, 0.67, 1.0]
 YDIVS = [0.0, 0.5, 1.0]
-DESKTOP_PADDING_TOP = 28
-DESKTOP_PADDING_RIGHT = 0
-DESKTOP_PADDING_BOTTOM = 0
-DESKTOP_PADDING_LEFT = 0
+DESKTOP_PADDING_TOP = [28]
+DESKTOP_PADDING_RIGHT = [0]
+DESKTOP_PADDING_BOTTOM = [0]
+DESKTOP_PADDING_LEFT = [0]
 FILTERS = {
     'top':          lambda x1,y1,x2,y2,w,h: (y1 == 0.0) and (y2 != 1.0) and centered(x1,x2) and (h <= 0.5),
     'right':        lambda x1,y1,x2,y2,w,h: (x1 != 0.0) and (x2 == 1.0) and centered(y1,y2) and (w <= 0.7),
@@ -68,7 +68,7 @@ class WindowManager(object):
         command_func = getattr(self, command, None)
         if command_func:
             return command_func()
-        print "Unknown command: %s" % command
+        print 'Unknown command: %s' % command
 
     def get_active_window(self):
         if (not self.screen.supports_net_wm_hint('_NET_ACTIVE_WINDOW') or
@@ -96,8 +96,8 @@ class WindowManager(object):
         # Get the monitor details
         monid = self.screen.get_monitor_at_window(win)
         mongeo = self.screen.get_monitor_geometry(monid)
-        mongeo.width = mongeo.width - DESKTOP_PADDING_LEFT - DESKTOP_PADDING_RIGHT
-        mongeo.height = mongeo.height - DESKTOP_PADDING_TOP - DESKTOP_PADDING_BOTTOM
+        mongeo.width = mongeo.width - self.padding_left(monid) - self.padding_right(monid)
+        mongeo.height = mongeo.height - self.padding_top(monid) - self.padding_bottom(monid)
         if not mongeo: return None, None, None, None
         # Reutrn the details
         wingeo = gtk.gdk.Rectangle(winx-mongeo.x, winy-mongeo.y, winw, winh)
@@ -118,11 +118,30 @@ class WindowManager(object):
         for pos, val in enumerate(dimensions):
             distance = sum([(wg-vv)**2 for (wg, vv) in zip(tuple(wingeo), tuple(val))])
             heappush(euclid_distance, (distance, pos))
+        if not euclid_distance:
+            print 'No positions to enumerate.'
+            return
         pos = heappop(euclid_distance)[1]
         newwingeo = gtk.gdk.Rectangle(*dimensions[(pos+1) % len(dimensions)])
-        newwingeo.x = newwingeo.x + DESKTOP_PADDING_LEFT
-        newwingeo.y = newwingeo.y + DESKTOP_PADDING_TOP
+        newwingeo.x = newwingeo.x + self.padding_left(monid)
+        newwingeo.y = newwingeo.y + self.padding_top(monid)
         self.reposition(win, newwingeo, mongeo)
+
+    def padding_top(self, monid):
+        index = monid if len(DESKTOP_PADDING_TOP) > monid else 0
+        return DESKTOP_PADDING_TOP[index]
+
+    def padding_right(self, monid):
+        index = monid if len(DESKTOP_PADDING_RIGHT) > monid else 0
+        return DESKTOP_PADDING_RIGHT[index]
+
+    def padding_bottom(self, monid):
+        index = monid if len(DESKTOP_PADDING_BOTTOM) > monid else 0
+        return DESKTOP_PADDING_BOTTOM[index]
+
+    def padding_left(self, monid):
+        index = monid if len(DESKTOP_PADDING_LEFT) > monid else 0
+        return DESKTOP_PADDING_LEFT[index]
 
     
 class PyGrid(object):
@@ -181,5 +200,3 @@ if __name__ == '__main__':
     # Start the PyGrid daemon
     positions = PositionGenerator(XDIVS, YDIVS).positions()
     PyGrid(positions).start_daemon()
-
-
