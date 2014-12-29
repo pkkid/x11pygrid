@@ -7,22 +7,24 @@ Keyboard-driven Window Tiling for your existing X11 window manager
 * python-xlib
 
 ### Keyboard Shortcuts ###
-ALT + CTRL + &lt;NUMPAD 1-9&gt;
+ALT + CTRL + NUMPAD 1-9<br/>
 Each number will push the current window to a different edge of the screen.
 
 ### Configuration Options ###
 
-**XDIVS**
-List of horizontal window percentages. *default: [0.0, 0.33, 0.5, 0.67, 1.0]*
+**XDIVS**<br/>
+List of horizontal window percentages.
+default: [0.0, 0.33, 0.5, 0.67, 1.0]
 
-**YDIVS**
-List of vertical window percentages. *default: [0.0, 0.5, 1.0]*
+**YDIVS**<br/>
+List of vertical window percentages.
+*default: [0.0, 0.5, 1.0]*
 
 **DESKTOP_PADDING_TOP, DESKTOP_PADDING_RIGHT,
-  DESKTOP_PADDING_BOTTOM, DESKTOP_PADDING_LEFT**
+  DESKTOP_PADDING_BOTTOM, DESKTOP_PADDING_LEFT**<br/>
 Number of pixels to pad the top of the screen. Useful to help PyGrid to know about status bars or application launchers.
 
-**FILTERS**
+**FILTERS**<br/>
 Dictionary containing rules to filter out any unwanted window sizes for each postion.  The following positions can be defined: {top, right, bottom, left, topleft, topright, bottomright, bottomleft, middle}. Each rule is a function that takes the arguments (x1,y1,x2,y2,w,h).  The function should return a boolean true for allowed and false for not allowed.
 
 The default filters are as follows (I apologize for formatting):
