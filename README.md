@@ -1,18 +1,15 @@
 ## PyGrid ##
 Keyboard-driven Window Tiling for your existing X11 window manager
 
-----
 ### Requirements ###
 * X11-based desktop and Python 2.x
 * python-gtk2
 * python-xlib
 
-----
 ### Keyboard Shortcuts ###
 ALT + CTRL + &lt;NUMPAD 1-9&gt;
 Each number will push the current window to a different edge of the screen.
 
-----
 ### Configuration Options ###
 
 **XDIVS**
@@ -42,7 +39,6 @@ The default filters are as follows (I apologize for formatting):
         'middle':       lambda x1,y1,x2,y2,w,h: centered(x1,x2) and centered(y1,y2) and (w != 1.0) and (h != 1.0),
     }
 
-----
 ### Credit ###
 PyGrid is a simpler version of the QuickTile project by ssokolow:
 https://github.com/ssokolow/quicktile
