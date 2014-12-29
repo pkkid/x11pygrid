@@ -14,7 +14,7 @@ Each number will push the current window to a different edge of the screen.
 
 **XDIVS**<br/>
 List of horizontal window percentages.
-default: [0.0, 0.33, 0.5, 0.67, 1.0]
+*default: [0.0, 0.33, 0.5, 0.67, 1.0]*
 
 **YDIVS**<br/>
 List of vertical window percentages.
