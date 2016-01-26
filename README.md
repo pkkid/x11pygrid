@@ -44,3 +44,5 @@ The default filters are as follows (I apologize for formatting):
 ### Credit ###
 PyGrid is a simpler version of the QuickTile project by ssokolow:
 https://github.com/ssokolow/quicktile
+
+[![Analytics](https://ga-beacon.appspot.com/UA-87461-7/pygrid/home)](https://github.com/igrigorik/ga-beacon)
