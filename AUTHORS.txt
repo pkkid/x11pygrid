@@ -1,5 +1,0 @@
-Primary Authors:
-  * Michael Shepanski
-
-This work is a derivation of the original QuickTile by ssokolow:
-https://github.com/ssokolow/quicktile

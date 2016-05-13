@@ -1,47 +1,40 @@
 ## PyGrid ##
-Keyboard-driven Window Tiling for your existing X11 window manager
+PyGrid is a small utility which allows you to easily organize your open windows by tiling, resizing and positioning them to make the best use of your desktop real estate.
 
 #### Requirements ####
 * X11-based desktop and Python3
-* python3-gi, python3-xlib
+* python3-gi python3-xlib
 
-#### Keyboard Shortcuts ####
-ALT + CTRL + NUMPAD 1-9<br/>
-Each number will push the current window to a different edge of the screen.
+#### Shortcuts ####
+* `ALT`+`CTRL`+`NUMPAD-1` - Move window to bottom left.
+* `ALT`+`CTRL`+`NUMPAD-2` - Move window to bottom.
+* `ALT`+`CTRL`+`NUMPAD-3` - Move window to bottom right.
+* `ALT`+`CTRL`+`NUMPAD-4` - Move window to left.
+* `ALT`+`CTRL`+`NUMPAD-5` - Move window to center.
+* `ALT`+`CTRL`+`NUMPAD-6` - Move window to right.
+* `ALT`+`CTRL`+`NUMPAD-7` - Move window to top left.
+* `ALT`+`CTRL`+`NUMPAD-8` - Move window to top.
+* `ALT`+`CTRL`+`NUMPAD-9` - Move window to top right.
 
-### Configuration Options ###
+#### Configuration ####
+Configuration is done via a JSON file located at `~/.config/pygrid.json` which will be created with default options if not found when starting up. The default configuration is below. If you introduce top level sections `'monitor0': {...}` or `'monitor1': {...}` to provide different options for each monitor on your system.  Any settings not defined will fall back to user-defined defaults, then global defaults. NOTE: Updating configuration in this JSON file does *not* require you to restart PyGrid.
 
-**XDIVS**<br/>
-List of horizontal window percentages.
-*default: [0.0, 0.33, 0.5, 0.67, 1.0]*
+```javascript
+{
+  'default': {
+    'xdivs': 3,               // number of x divisions for the screen.
+    'ydivs': 2,               // number of y divisions for the screen.
+    'padding': [0, 0, 0, 0],  // additional top, right, bottom, left padding in pixels.
+    'spacing': 4,             // spacing between windows in pixels.
+    'minwidth': 0.25,         // min percent width of window.
+    'maxwidth': 0.67,         // max percent width of window.
+    'minheight': 0.33,        // min percent height of window.
+    'maxheight': 0.67,        // max percent height of window.
+  },
+  'monitor0': { ... },        // Repeat any settings above specific for monitor 0.
+  'monitor1': { ... },        // Repeat any settings above specific for monitor 1.
+}
+```
 
-**YDIVS**<br/>
-List of vertical window percentages.
-*default: [0.0, 0.5, 1.0]*
-
-**DESKTOP_PADDING_TOP, DESKTOP_PADDING_RIGHT,
-  DESKTOP_PADDING_BOTTOM, DESKTOP_PADDING_LEFT**<br/>
-Number of pixels to pad the top of the screen. Useful to help PyGrid to know about status bars or application launchers.
-
-**FILTERS**<br/>
-Dictionary containing rules to filter out any unwanted window sizes for each postion.  The following positions can be defined: {top, right, bottom, left, topleft, topright, bottomright, bottomleft, middle}. Each rule is a function that takes the arguments (x1,y1,x2,y2,w,h).  The function should return a boolean true for allowed and false for not allowed.
-
-The default filters are as follows (I apologize for formatting):
-
-    FILTERS = {
-        'top':          lambda x1,y1,x2,y2,w,h: (y1 == 0.0) and (y2 != 1.0) and centered(x1,x2) and (h <= 0.5),
-        'right':        lambda x1,y1,x2,y2,w,h: (x1 != 0.0) and (x2 == 1.0) and centered(y1,y2) and (w <= 0.7),
-        'bottom':       lambda x1,y1,x2,y2,w,h: (y1 != 0.0) and (y2 == 1.0) and centered(x1,x2) and (h <= 0.5),
-        'left':         lambda x1,y1,x2,y2,w,h: (x1 == 0.0) and (x2 != 1.0) and centered(y1,y2) and (w <= 0.7),
-        'topleft':      lambda x1,y1,x2,y2,w,h: (x1 == 0.0) and (y1 == 0.0) and (x2 != 1.0) and (y2 != 1.0) and (w <= 0.7) and (h <= 0.5),
-        'topright':     lambda x1,y1,x2,y2,w,h: (x1 != 0.0) and (y1 == 0.0) and (x2 == 1.0) and (y2 != 1.0) and (w <= 0.7) and (h <= 0.5),
-        'bottomright':  lambda x1,y1,x2,y2,w,h: (x1 != 0.0) and (y1 != 0.0) and (x2 == 1.0) and (y2 == 1.0) and (w <= 0.7) and (h <= 0.5),
-        'bottomleft':   lambda x1,y1,x2,y2,w,h: (x1 == 0.0) and (y1 != 0.0) and (x2 != 1.0) and (y2 == 1.0) and (w <= 0.7) and (h <= 0.5),
-        'middle':       lambda x1,y1,x2,y2,w,h: centered(x1,x2) and centered(y1,y2) and (w != 1.0) and (h != 1.0),
-    }
-
-### Credit ###
-PyGrid is a simpler version of the QuickTile project by ssokolow:
-https://github.com/ssokolow/quicktile
-
-[![Analytics](https://ga-beacon.appspot.com/UA-87461-7/pygrid/home)](https://github.com/igrigorik/ga-beacon)
+#### Credit & License ####
+PyGrid was original a fork of [QuickTile by ssokolow](https://github.com/ssokolow/quicktile), but rewritten to allow a much easier configuration as well as updated code to run on Python3 & GTK3. Code released under GPLv2 License.

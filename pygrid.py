@@ -5,21 +5,26 @@ Easily organize open windows on X11 desktop.
 """
 import copy, json, os
 import gi, signal
+from collections import namedtuple
 from itertools import product
 from Xlib import display, X
 from Xlib.keysymdef import miscellany
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject  # noqa
-from gi.repository import Gdk, GdkX11  # noqa
+from gi.repository import Gdk  # noqa
 
+# Simple class definitions
+SeqP = namedtuple('SeqP', ['x1p','x2p', 'y1p', 'y2p', 'wp', 'hp'])  # sequence as a percent
+Seq = namedtuple('Seq', ['x1','x2', 'y1', 'y2', 'w', 'h'])          # sequence as coordinates
 
+# Constants
 CONFIG_PATH = os.path.expanduser('~/.config/pygrid.json')
 DEFAULT_CONFIG = {
     'default': {
         'xdivs': 3,                 # number of x divisions for the screen
         'ydivs': 2,                 # number of y divisions for the screen
         'padding': [0, 0, 0, 0],    # additional top, right, bottom, left padding (pixels)
-        #'spacing': 4,               # spacing between windows (pixels)
+        'spacing': 4,               # spacing between windows (pixels)
         'minwidth': 0.25,           # min percent width of window
         'maxwidth': 0.67,           # max percent width of window
         'minheight': 0.33,          # min percent height of window
@@ -47,7 +52,8 @@ class PyGrid(object):
         self.keys = {}
 
     def start(self):
-        # watch for keyboard events
+        """ Write config if not found and watch for keyboard events. """
+        self._get_config()
         self.root.change_attributes(event_mask=X.KeyPressMask)
         self.keys = {self.display.keysym_to_keycode(k):v for k,v in self.KEYS.items()}
         for keycode in self.keys:
@@ -55,64 +61,106 @@ class PyGrid(object):
             self.root.grab_key(keycode, X.ControlMask | X.Mod1Mask | X.Mod2Mask, 1, X.GrabModeAsync, X.GrabModeAsync)
         for event in range(0, self.root.display.pending_events()):
             self.root.display.next_event()
-        GObject.io_add_watch(self.root.display, GObject.IO_IN, self.handle_event)
+        GObject.io_add_watch(self.root.display, GObject.IO_IN, self._check_event)
+        print('PyGrid running. Press CTRL+C to cancel.')
         Gtk.main()
 
-    def handle_event(self, source, condition, handle=None):
+    def _check_event(self, source, condition, handle=None):
+        """ Check keyboard event has all the right buttons pressed. """
         handle = handle or self.root.display
         for _ in range(0, handle.pending_events()):
             event = handle.next_event()
             if event.type == X.KeyPress:
-                try:
-                    # get window and screen details
-                    keypos = self.keys[event.detail]
-                    screen = Gdk.Screen.get_default()
-                    screen_num = screen.get_number()
-                    window = self._get_active_window(screen)
-                    window_frame = window.get_frame_extents()
-                    workarea = screen.get_monitor_workarea(screen_num)
-                    config = self._get_config(screen_num)
-                    print('Move window %s: %s' % (window.get_xid(), keypos['name']))
-                    print('  window_frame: %s' % _rstr(window_frame))
-                    print('  workarea: %s (screen: %s)' % (_rstr(workarea), screen_num))
-                    print('  config %s' % config)
-                    positions = self._generate_positons(workarea, keypos, config)
-                except Exception as err:
-                    print('Err: %s' % err)
-                    raise
+                keypos = self.keys[event.detail]
+                self._handle_event(keypos)
         return True
 
+    def _handle_event(self, keypos):
+        screen = Gdk.Screen.get_default()
+        window = self._get_active_window(screen)
+        if not window: return
+        monitorid = screen.get_monitor_at_window(window)
+        windowframe = window.get_frame_extents()
+        config = self._get_config(monitorid)
+        workarea = self._get_workarea(screen, monitorid, config)
+        seqps = self._generate_sequence_percents(workarea, keypos, config)
+        seqs = [self._seqp_to_seq(s, workarea, config) for s in seqps]
+        currindex = self._find_current_seq(windowframe, seqs)
+        print('\nMove window %s to %s..' % (window.get_xid(), keypos['name']))
+        print('  config: {{xdivs:{xdivs}, ydivs:{ydivs}, minw:{minwidth}, maxw:{maxwidth}, minh:{minheight}, maxh:{maxheight}, padding:{padding}}}'.format(**config))
+        print('  windowframe: %s' % _rstr(windowframe))
+        print('  workarea: %s (monitorid:%s)' % (_rstr(workarea), monitorid))
+        for seqp in seqs:
+            print('  %s' % str(seqp))
+
     def _get_active_window(self, screen):
+        """ Get the current active window. """
         window = screen.get_active_window()
         if not screen.supports_net_wm_hint(Gdk.atom_intern('_NET_ACTIVE_WINDOW', True)): return None
         if not screen.supports_net_wm_hint(Gdk.atom_intern('_NET_WM_WINDOW_TYPE', True)): return None
         if window.get_type_hint().value_name == 'GDK_WINDOW_TYPE_HINT_DESKTOP': return None
         return window
 
-    def _get_config(self, screen_num):
+    def _get_config(self, monitorid=0):
+        """ Get the configuration for the specified monitorid. Write config file if not found. """
         config = copy.deepcopy(DEFAULT_CONFIG)['default']
         if os.path.exists(CONFIG_PATH):
             try:
-                userconfig = json.load(CONFIG_PATH)
-                config.update(userconfig.get('default', {}))
-                config.update(userconfig.get('monitor%s' % screen_num, {}))
+                with open(CONFIG_PATH, 'r') as handle:
+                    userconfig = json.load(handle)
+                    config.update(userconfig.get('default', {}))
+                    config.update(userconfig.get('monitor%s' % monitorid, {}))
             except Exception as err:
                 print('Unable to parse userconfig: %s; %s' % (CONFIG_PATH, err))
-                raise
+        else:
+            print('Writing default config: %s' % CONFIG_PATH)
+            with open(CONFIG_PATH, 'w') as handle:
+                json.dump(DEFAULT_CONFIG, handle, indent=2, sort_keys=True)
         return config
 
-    def _generate_positons(self, workarea, keypos, config):
+    def _get_workarea(self, screen, monitorid, config):
+        """ get the monitor workarea taking into account config padding. """
+        workarea = screen.get_monitor_workarea(monitorid)
+        workarea.x += config['padding'][3]
+        workarea.y += config['padding'][0]
+        workarea.width -= config['padding'][3] + config['padding'][1]
+        workarea.height -= config['padding'][0] + config['padding'][1]
+        return workarea
+
+    def _generate_sequence_percents(self, workarea, keypos, config):
+        """ Generate a list of sequence positions (as percents). """
         positions = []
         for x1p, x2p in product(_iter_percent(config['xdivs']), repeat=2):
             for y1p, y2p in product(_iter_percent(config['ydivs']), repeat=2):
-                wp, hp = round(x2p-x1p,3), round(y2p-y1p,3)
+                wp, hp = round(x2p-x1p,4), round(y2p-y1p,4)
                 if x1p >= x2p or y1p >= y2p: continue
                 if not keypos['filter'](x1p, x2p, y1p, y2p): continue
                 if keypos['name'] not in ['top', 'middle', 'bottom'] and not config['minwidth'] <= wp <= config['maxwidth']: continue
                 if keypos['name'] not in ['left', 'middle', 'right'] and not config['minheight'] <= hp <= config['maxheight']: continue
-                print('  x1p:%-6s x2p:%-6s y1p:%-6s y2p:%-6s wp:%-6s hp:%-6s' % (x1p, x2p, y1p, y2p, wp, hp))
-                positions.append((x1p, x2p, y1p, y2p, wp, hp))
+                positions.append(SeqP(x1p, x2p, y1p, y2p, wp, hp))
         return positions
+
+    def _seqp_to_seq(self, seqp, workarea, config):
+        """ Convert sequence from percents to coordinates taking into account config spacing. """
+        seq = Seq(
+            x1=int(round(workarea.x + (workarea.width * seqp.x1p))),
+            x2=int(round(workarea.x + (workarea.width * seqp.x2p))),
+            y1=int(round(workarea.y + (workarea.width * seqp.y1p))),
+            y2=int(round(workarea.y + (workarea.width * seqp.y2p))),
+            w=int(round(workarea.width * seqp.wp)),
+            h=int(round(workarea.height * seqp.hp)),
+        )
+        if config['spacing']:
+            halfspace = int(config['spacing'] / 2)
+            if seqp.x1p != 0.0: seq = seq._replace(x1=seq.x1+halfspace, w=seq.w-halfspace)
+            if seqp.y1p != 0.0: seq = seq._replace(y1=seq.y1+halfspace, h=seq.h-halfspace)
+            if seqp.x2p != 1.0: seq = seq._replace(x2=seq.x2-halfspace, w=seq.w-halfspace)
+            if seqp.y2p != 1.0: seq = seq._replace(y2=seq.y2-halfspace, h=seq.h-halfspace)
+        return seq
+
+    def _find_current_seq(self, windowframe, seqs):
+        for i, seq in enumerate(seqs):
+            print(i, seq)
 
 
 def _center(p1, p2):
@@ -133,6 +181,31 @@ if __name__ == '__main__':
     PyGrid().start()
 
 
+#     def reposition(self, win, wingeo, mongeo):
+#         border, titlebar = self.get_frame_thickness(win)
+#         win.move_resize(wingeo.x+mongeo.x, wingeo.y+mongeo.y,
+#             wingeo.width-(border*2), wingeo.height-(titlebar+border))
+
+#     def cycle_dimensions(self, positions):
+#         win, wingeo, monid, mongeo = self.get_window_state()
+#         dimensions = []
+#         for pos in positions:
+#             dimensions.append([int(pos[0]*mongeo.width), int(pos[1]*mongeo.height),
+#                 int(pos[2]*mongeo.width), int(pos[3]*mongeo.height)])
+#         euclid_distance = []
+#         for pos, val in enumerate(dimensions):
+#             distance = sum([(wg-vv)**2 for (wg, vv) in zip(tuple(wingeo), tuple(val))])
+#             heappush(euclid_distance, (distance, pos))
+#         if not euclid_distance:
+#             print 'No positions to enumerate.'
+#             return
+#         pos = heappop(euclid_distance)[1]
+#         newwingeo = gtk.gdk.Rectangle(*dimensions[(pos+1) % len(dimensions)])
+#         newwingeo.x = newwingeo.x + self.padding_left(monid)
+#         newwingeo.y = newwingeo.y + self.padding_top(monid)
+#         self.reposition(win, newwingeo, mongeo)
+
+
 #     # Load user-defined config if it exists
 #     configfile = os.path.join(os.getenv("HOME"), '.config', 'pygridrc.py')
 #     if os.path.isfile(configfile):
@@ -144,7 +217,6 @@ if __name__ == '__main__':
 #     # Start the PyGrid daemon
 #     positions = PositionGenerator(XDIVS, YDIVS).positions()
 #     PyGrid(positions).start_daemon()
-
 
 
 #from heapq import heappop, heappush
@@ -180,7 +252,7 @@ if __name__ == '__main__':
 # }
 
 
-# class PositionGenerator(object):    
+# class PositionGenerator(object):
 
 #     def __init__(self, xdivs, ydivs):
 #         self.xdivs = xdivs
