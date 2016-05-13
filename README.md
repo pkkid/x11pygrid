@@ -33,6 +33,7 @@ Configuration is done via a JSON file located at `~/.config/pygrid.json` which w
   },
   'monitor0': { ... },        // Repeat any settings above specific for monitor 0.
   'monitor1': { ... },        // Repeat any settings above specific for monitor 1.
+  'monitor<NUM>': { ... },    // Repeat any settings above specific for monitor <NUM>.
 }
 ```
 
