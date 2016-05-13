@@ -16,6 +16,8 @@ PyGrid is a small utility which allows you to easily organize your open windows 
 * `ALT`+`CTRL`+`NUMPAD-8` - Move window to top.
 * `ALT`+`CTRL`+`NUMPAD-9` - Move window to top right.
 
+Repeatedly press one of the defined keybindings to cycle through window sizes available at the desired location on the screen.
+
 #### Configuration ####
 Configuration is done via a JSON file located at `~/.config/pygrid.json` which will be created with default options if not found when starting up. The default configuration is below. If you introduce top level sections `'monitor0': {...}` or `'monitor1': {...}` to provide different options for each monitor on your system.  Any settings not defined will fall back to user-defined defaults, then global defaults. NOTE: Updating configuration in this JSON file does *not* require you to restart PyGrid.
 
