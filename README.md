@@ -1,12 +1,11 @@
 ## PyGrid ##
 Keyboard-driven Window Tiling for your existing X11 window manager
 
-### Requirements ###
-* X11-based desktop and Python 2.x
-* python-gtk2
-* python-xlib
+#### Requirements ####
+* X11-based desktop and Python3
+* python3-gi, python3-xlib
 
-### Keyboard Shortcuts ###
+#### Keyboard Shortcuts ####
 ALT + CTRL + NUMPAD 1-9<br/>
 Each number will push the current window to a different edge of the screen.
 
