@@ -1,10 +1,12 @@
 ## PyGrid ##
-<img src='example.gif' style='float:right;'/>
-PyGrid is a small utility which allows you to easily organize your open windows by tiling, resizing and positioning them to make the best use of your desktop real estate.
+<img align='right' width='500' src='example.gif'/>
+PyGrid is a small utility which allows you to easily organize your open windows by tiling, resizing and positioning them to make the best use of your desktop real estate. It's easy to configure and supports multiple monitors.
 
 #### Requirements ####
-* X11-based desktop and Python3
-* python3-gi python3-xlib
+* Python3
+* X11-based desktop
+* python3-gi
+* python3-xlib
 
 #### Shortcuts ####
 * `ALT`+`CTRL`+`NUMPAD-1` - Move window to bottom left.
