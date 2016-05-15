@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PyGrid - M.Shepanski 2014
+PyGrid - M.Shepanski 2016
 Easily organize open windows on X11 desktop.
 """
 import copy, json, os
