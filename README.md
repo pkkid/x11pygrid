@@ -1,5 +1,5 @@
 ## PyGrid ##
-<img align='right' width='500' src='example.gif'/>
+<img align='right' width='500' src='example2.gif'/>
 PyGrid is a small utility which allows you to easily organize your open windows by tiling, resizing and positioning them to make the best use of your desktop real estate. It's easy to configure and supports multiple monitors.
 
 #### Requirements ####
