@@ -72,25 +72,28 @@ class PyGrid(object):
         return True
 
     def _handle_event(self, keypos):
-        screen = Gdk.Screen.get_default()
-        window = self._get_active_window(screen)
-        if not window: return
-        monitorid = screen.get_monitor_at_window(window)
-        windowframe = window.get_frame_extents()
-        config = self._get_config(monitorid)
-        workarea = self._get_workarea(screen, monitorid, config)
-        seqs = self._generate_sequence_percents(workarea, keypos, config)
-        dists = self._get_seq_distances(windowframe, seqs)
-        currindex = sorted(dists)[0][1]
-        nextindex = (currindex + 1) % len(seqs)
-        print('\nMove window %s to %s..' % (window.get_xid(), keypos['name']))
-        print('  config: xdivs={xdivs}, ydivs={ydivs}, minw={minwidth}, maxw={maxwidth}, '
-            'minh={minheight}, maxh={maxheight}, padding={padding}'.format(**config))
-        print('  workarea: %s (monitorid:%s)' % (_rstr(workarea), monitorid))
-        print('  windowframe: %s' % _rstr(windowframe))
-        for i, seqp in enumerate(seqs):
-            print('  %s; dist=%s' % (str(seqp), dists[i][0]))
-        self._move_window(window, seqs[nextindex])
+        try:
+            screen = Gdk.Screen.get_default()
+            window = self._get_active_window(screen)
+            if not window: return
+            monitorid = screen.get_monitor_at_window(window)
+            windowframe = window.get_frame_extents()
+            config = self._get_config(monitorid)
+            workarea = self._get_workarea(screen, monitorid, config)
+            seqs = self._generate_sequence_percents(workarea, keypos, config)
+            dists = self._get_seq_distances(windowframe, seqs)
+            currindex = sorted(dists)[0][1]
+            nextindex = (currindex + 1) % len(seqs)
+            print('\nMove window %s to %s..' % (window.get_xid(), keypos['name']))
+            print('  config: xdivs={xdivs}, ydivs={ydivs}, minw={minwidth}, maxw={maxwidth}, '
+                'minh={minheight}, maxh={maxheight}, padding={padding}'.format(**config))
+            print('  workarea: %s (monitorid:%s)' % (_rstr(workarea), monitorid))
+            print('  windowframe: %s' % _rstr(windowframe))
+            for i, seqp in enumerate(seqs):
+                print('  %s; dist=%s' % (str(seqp), dists[i][0]))
+            self._move_window(window, seqs[nextindex])
+        except Exception as err:
+            print('  Unable to move window: %s' % err)
 
     def _get_active_window(self, screen):
         """ Get the current active window. """
