@@ -3,12 +3,13 @@
 PyGrid - M.Shepanski 2016
 Easily organize open windows on X11 desktop.
 """
-import copy, json, os
-import gi, signal
+import copy, json, os, signal
 from collections import namedtuple
 from itertools import product
 from Xlib import display, X
 from Xlib.keysymdef import miscellany
+
+import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject  # noqa
 from gi.repository import Gdk  # noqa

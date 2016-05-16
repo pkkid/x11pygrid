@@ -1,0 +1,5 @@
+parts/*
+snap/*
+stage/*
+*.snap
+snapcraft.yaml

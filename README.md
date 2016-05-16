@@ -1,5 +1,5 @@
 ## PyGrid ##
-<img align='right' width='500' src='example2.gif'/>
+<img align='right' width='500' src='example.gif'/>
 PyGrid is a small utility which allows you to easily organize your open windows by tiling, resizing and positioning them to make the best use of your desktop real estate. It's easy to configure and supports multiple monitors.
 
 #### Requirements ####
@@ -41,6 +41,21 @@ Configuration is done via a JSON file located at `~/.config/pygrid.json` which w
   'monitor<NUM>': { ... },    // Repeat any settings above specific for monitor <NUM>.
 }
 ```
+
+#### Installation on Ubuntu ####
+```bash
+$ sudo apt-get install git python3-gi python3-xlib
+$ cd <place-you-want-to-store-pygrid>
+$ git clone https://github.com/mjs7231/pygrid.git
+$ cd pygrid && ./pygrid.py
+```
+
+To start at boot I simply added the following line to *Startup Applications*.
+```bash
+<full-path>/pygrid/pygrid.py
+```
+ 
+
 
 #### Credit & License ####
 PyGrid was original a fork of [QuickTile by ssokolow](https://github.com/ssokolow/quicktile), but rewritten to allow a much easier configuration as well as updated code to run on Python3 & GTK3. Code released under GPLv2 License.
