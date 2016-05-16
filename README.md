@@ -52,7 +52,7 @@ $ cd pygrid && ./pygrid.py
 
 To start at boot I simply added the following line to *Startup Applications*.
 ```bash
-<full-path>/pygrid/pygrid.py
+/usr/bin/python3 <full-path>/pygrid/pygrid.py
 ```
  
 
