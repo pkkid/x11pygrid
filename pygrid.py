@@ -178,6 +178,7 @@ class PyGrid(object):
         offx, offy = origin.x - root.x, origin.y - root.y
         print('  newpos: x=%s, y=%s, w=%s, h=%s (offx:%s, offy:%s)' % (seq.x1, seq.y1,
             seq.w-(offx*2), seq.h-(offx+offy), offx, offy))
+        window.unmaximize()
         window.set_shadow_width(0,0,0,0)
         window.move_resize(seq.x1, seq.y1, seq.w-(offx*2), seq.h-(offx+offy))
 
