@@ -35,6 +35,7 @@ Configuration is done via a JSON file located at `~/.config/pygrid.json` which w
     'maxwidth': 0.67,         // max percent width of window.
     'minheight': 0.33,        // min percent height of window.
     'maxheight': 0.67,        // max percent height of window.
+    'snaptocursor': false,    // window will be moved to cursor's monitor
   },
   'monitor0': { ... },        // Repeat any settings above specific for monitor 0.
   'monitor1': { ... },        // Repeat any settings above specific for monitor 1.
