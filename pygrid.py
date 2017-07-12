@@ -18,6 +18,7 @@ Seq = namedtuple('Seq', ['x1','x2', 'y1', 'y2', 'w', 'h'])
 CONFIG_PATH = os.path.expanduser('~/.config/pygrid.json')
 DEFAULT_CONFIG = {
     'default': {
+        'snaptocursor': False,      # window will be moved to cursor's monitor
         'xdivs': 3,                 # number of x divisions for the screen
         'ydivs': 2,                 # number of y divisions for the screen
         'padding': [0, 0, 0, 0],    # additional top, right, bottom, left padding (pixels)
@@ -77,7 +78,11 @@ class PyGrid(object):
             screen = Gdk.Screen.get_default()
             window = self._get_active_window(screen)
             if not window: return
-            monitorid = screen.get_monitor_at_window(window)
+            if self._get_config()['snaptocursor']:
+                cursor = screen.get_display().get_default_seat().get_pointer().get_position()
+                monitorid = screen.get_monitor_at_point(cursor.x, cursor.y)
+            else:
+                monitorid = screen.get_monitor_at_window(window)
             windowframe = window.get_frame_extents()
             config = self._get_config(monitorid)
             workarea = self._get_workarea(screen, monitorid, config)
