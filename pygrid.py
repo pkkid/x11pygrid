@@ -3,11 +3,18 @@
 PyGrid - M.Shepanski 2016
 Easily organize open windows on X11 desktop.
 """
-import copy, json, os, signal
+import copy, json, os, signal, socket
 from collections import namedtuple
 from itertools import product
 from Xlib import display, X
 from Xlib.keysymdef import miscellany
+
+try:
+    # Create singleton using abstract socket (prefix with null)
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.bind('\0pygrid_singleton_lock')
+except socket.error as err:
+    raise SystemExit('PyGrid already running, exiting.')
 
 import gi
 gi.require_version('Gtk', '3.0')
