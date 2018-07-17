@@ -7,7 +7,7 @@ import copy, json, os, signal, socket
 from collections import namedtuple
 from itertools import product
 from Xlib import display, X
-from Xlib.keysymdef import miscellany
+from Xlib.keysymdef import latin1
 
 try:
     # Create singleton using abstract socket (prefix with null)
@@ -40,15 +40,15 @@ DEFAULT_CONFIG = {
 
 class PyGrid(object):
     KEYS = {
-        miscellany.XK_KP_1: {'name':'bottomleft',  'filter':lambda s: s.x1 == 0.0 and s.y2 == 1.0},
-        miscellany.XK_KP_2: {'name':'bottom',      'filter':lambda s: s.y2 == 1.0 and _center(s.x1,s.x2)},
-        miscellany.XK_KP_3: {'name':'bottomright', 'filter':lambda s: s.x2 == 1.0 and s.y2 == 1.0},
-        miscellany.XK_KP_4: {'name':'left',        'filter':lambda s: s.x1 == 0.0 and _center(s.y1,s.y2)},
-        miscellany.XK_KP_5: {'name':'middle',      'filter':lambda s: _center(s.x1,s.x2) and _center(s.y1,s.y2)},
-        miscellany.XK_KP_6: {'name':'right',       'filter':lambda s: s.x2 == 1.0 and _center(s.y1,s.y2)},
-        miscellany.XK_KP_7: {'name':'topleft',     'filter':lambda s: s.x1 == 0.0 and s.y1 == 0.0},
-        miscellany.XK_KP_8: {'name':'top',         'filter':lambda s: s.y1 == 0.0 and _center(s.x1,s.x2)},
-        miscellany.XK_KP_9: {'name':'topright',    'filter':lambda s: s.x2 == 1.0 and s.y1 == 0.0},
+        latin1.XK_1: {'name':'bottomleft',  'filter':lambda s: s.x1 == 0.0 and s.y2 == 1.0},
+        latin1.XK_2: {'name':'bottom',      'filter':lambda s: s.y2 == 1.0 and _center(s.x1,s.x2)},
+        latin1.XK_3: {'name':'bottomright', 'filter':lambda s: s.x2 == 1.0 and s.y2 == 1.0},
+        latin1.XK_4: {'name':'left',        'filter':lambda s: s.x1 == 0.0 and _center(s.y1,s.y2)},
+        latin1.XK_5: {'name':'middle',      'filter':lambda s: _center(s.x1,s.x2) and _center(s.y1,s.y2)},
+        latin1.XK_6: {'name':'right',       'filter':lambda s: s.x2 == 1.0 and _center(s.y1,s.y2)},
+        latin1.XK_7: {'name':'topleft',     'filter':lambda s: s.x1 == 0.0 and s.y1 == 0.0},
+        latin1.XK_8: {'name':'top',         'filter':lambda s: s.y1 == 0.0 and _center(s.x1,s.x2)},
+        latin1.XK_9: {'name':'topright',    'filter':lambda s: s.x2 == 1.0 and s.y1 == 0.0},
     }
 
     def __init__(self):
