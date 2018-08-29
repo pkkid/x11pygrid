@@ -47,6 +47,8 @@ DEFAULT_CONFIG = {
             'KP_7': 'topleft',
             'KP_8': 'top',
             'KP_9': 'topright',
+            'KP_0': 'maximize',
+            'KP_Enter': 'cycle-monitor',
         }
     }
 }
@@ -107,11 +109,20 @@ class PyGrid(object):
             screen = Gdk.Screen.get_default()
             window = self._get_active_window(screen)
             if not window: return
+
+            if command == 'maximize':
+                self._maximize(window)
+                return
+            if command == 'cycle-monitor':
+                self._cycle_monitor(screen, window)
+                return
+
             if self._get_config()['snaptocursor']:
                 cursor = screen.get_display().get_default_seat().get_pointer().get_position()
                 monitorid = screen.get_monitor_at_point(cursor.x, cursor.y)
             else:
                 monitorid = screen.get_monitor_at_window(window)
+
             windowframe = window.get_frame_extents()
             config = self._get_config(monitorid)
             workarea = self._get_workarea(screen, monitorid, config)
@@ -217,6 +228,24 @@ class PyGrid(object):
         window.set_shadow_width(0,0,0,0)
         window.move_resize(seq.x1, seq.y1, seq.w-(offx*2), seq.h-(offx+offy))
 
+    def _cycle_monitor(self, screen, window):
+        monitor_id = screen.get_monitor_at_window(window)
+        new_monitor_id = (monitor_id + 1) % Gdk.Screen.get_n_monitors(screen)
+        monitor_geom = Gdk.Screen.get_monitor_geometry(screen, monitor_id)
+        new_monitor_geom = Gdk.Screen.get_monitor_geometry(screen, new_monitor_id)
+        print('Moving window to monitor %s, which has geometry: %sx%s %sx%s' % (new_monitor_id,
+            new_monitor_geom.x, new_monitor_geom.y,
+            new_monitor_geom.width, new_monitor_geom.height))
+        window_geom = window.get_frame_extents()
+        window.move_resize(
+            window_geom.x - monitor_geom.x + new_monitor_geom.x,
+            window_geom.y - monitor_geom.y + new_monitor_geom.y,
+            window_geom.width,
+            window_geom.height
+        )
+
+    def _maximize(self, window):
+        window.maximize()
 
 def _center(p1, p2):
     return round(1.0 - p2, 4) == p1
