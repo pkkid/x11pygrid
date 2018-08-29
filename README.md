@@ -40,6 +40,20 @@ Configuration is done via a JSON file located at `~/.config/pygrid.json` which w
   'monitor0': { ... },        // Repeat any settings above specific for monitor 0.
   'monitor1': { ... },        // Repeat any settings above specific for monitor 1.
   'monitor<NUM>': { ... },    // Repeat any settings above specific for monitor <NUM>.
+  'keys': {
+    'accelerator': '<Ctrl><Mod1><Mod2>',
+    'commands': {
+      'KP_1': 'bottomleft',
+      'KP_2': 'bottom',
+      'KP_3': 'bottomright',
+      'KP_4': 'left',
+      'KP_5': 'middle',
+      'KP_6': 'right',
+      'KP_7': 'topleft',
+      'KP_8': 'top',
+      'KP_9': 'topright'
+    }
+  }
 }
 ```
 
