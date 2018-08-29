@@ -35,20 +35,34 @@ DEFAULT_CONFIG = {
         'minheight': 0.33,          # min percent height of window
         'maxheight': 0.67,          # max percent height of window
     },
+    'keys': {
+        'accelerator': '<Ctrl><Mod1><Mod2>',
+        'commands': {
+            'KP_1': 'bottomleft',
+            'KP_2': 'bottom',
+            'KP_3': 'bottomright',
+            'KP_4': 'left',
+            'KP_5': 'middle',
+            'KP_6': 'right',
+            'KP_7': 'topleft',
+            'KP_8': 'top',
+            'KP_9': 'topright',
+        }
+    }
 }
 
 
 class PyGrid(object):
-    KEYS = {
-        miscellany.XK_KP_1: {'name':'bottomleft',  'filter':lambda s: s.x1 == 0.0 and s.y2 == 1.0},
-        miscellany.XK_KP_2: {'name':'bottom',      'filter':lambda s: s.y2 == 1.0 and _center(s.x1,s.x2)},
-        miscellany.XK_KP_3: {'name':'bottomright', 'filter':lambda s: s.x2 == 1.0 and s.y2 == 1.0},
-        miscellany.XK_KP_4: {'name':'left',        'filter':lambda s: s.x1 == 0.0 and _center(s.y1,s.y2)},
-        miscellany.XK_KP_5: {'name':'middle',      'filter':lambda s: _center(s.x1,s.x2) and _center(s.y1,s.y2)},
-        miscellany.XK_KP_6: {'name':'right',       'filter':lambda s: s.x2 == 1.0 and _center(s.y1,s.y2)},
-        miscellany.XK_KP_7: {'name':'topleft',     'filter':lambda s: s.x1 == 0.0 and s.y1 == 0.0},
-        miscellany.XK_KP_8: {'name':'top',         'filter':lambda s: s.y1 == 0.0 and _center(s.x1,s.x2)},
-        miscellany.XK_KP_9: {'name':'topright',    'filter':lambda s: s.x2 == 1.0 and s.y1 == 0.0},
+    FILTERS = {
+        'bottomleft' : lambda s: s.x1 == 0.0 and s.y2 == 1.0,
+        'bottom'     : lambda s: s.y2 == 1.0 and _center(s.x1,s.x2),
+        'bottomright': lambda s: s.x2 == 1.0 and s.y2 == 1.0,
+        'left'       : lambda s: s.x1 == 0.0 and _center(s.y1,s.y2),
+        'middle'     : lambda s: _center(s.x1,s.x2) and _center(s.y1,s.y2),
+        'right'      : lambda s: s.x2 == 1.0 and _center(s.y1,s.y2),
+        'topleft'    : lambda s: s.x1 == 0.0 and s.y1 == 0.0,
+        'top'        : lambda s: s.y1 == 0.0 and _center(s.x1,s.x2),
+        'topright'   : lambda s: s.x2 == 1.0 and s.y1 == 0.0,
     }
 
     def __init__(self):
@@ -60,15 +74,23 @@ class PyGrid(object):
         """ Write config if not found and watch for keyboard events. """
         self._get_config()
         self.root.change_attributes(event_mask=X.KeyPressMask)
-        self.keys = {self.display.keysym_to_keycode(k):v for k,v in self.KEYS.items()}
-        for keycode in self.keys:
-            self.root.grab_key(keycode, X.ControlMask | X.Mod1Mask, 1, X.GrabModeAsync, X.GrabModeAsync)
-            self.root.grab_key(keycode, X.ControlMask | X.Mod1Mask | X.Mod2Mask, 1, X.GrabModeAsync, X.GrabModeAsync)
+        self._bind_keys()
         for event in range(0, self.root.display.pending_events()):
             self.root.display.next_event()
         GObject.io_add_watch(self.root.display, GObject.IO_IN, self._check_event)
         print('PyGrid running. Press CTRL+C to cancel.')
         Gtk.main()
+
+    def _bind_keys(self):
+        """ Bind keys from config """
+        config = self._get_config()
+        for key, command in config['keys']['commands'].items():
+            # See https://developer.gnome.org/gtk3/stable/gtk3-Keyboard-Accelerators.html#gtk-accelerator-parse
+            keysym, modmask = Gtk.accelerator_parse(config['keys']['accelerator'] + key)
+            keycode = self.display.keysym_to_keycode(keysym)
+
+            self.keys[keycode] = command
+            self.root.grab_key(keycode, modmask, 1, X.GrabModeAsync, X.GrabModeAsync)
 
     def _check_event(self, source, condition, handle=None):
         """ Check keyboard event has all the right buttons pressed. """
@@ -76,11 +98,11 @@ class PyGrid(object):
         for _ in range(0, handle.pending_events()):
             event = handle.next_event()
             if event.type == X.KeyPress:
-                keypos = self.keys[event.detail]
-                self._handle_event(keypos)
+                command = self.keys[event.detail]
+                self._handle_event(command)
         return True
 
-    def _handle_event(self, keypos):
+    def _handle_event(self, command):
         try:
             screen = Gdk.Screen.get_default()
             window = self._get_active_window(screen)
@@ -93,11 +115,11 @@ class PyGrid(object):
             windowframe = window.get_frame_extents()
             config = self._get_config(monitorid)
             workarea = self._get_workarea(screen, monitorid, config)
-            seqs = self._generate_sequence_percents(workarea, keypos, config)
+            seqs = self._generate_sequence_percents(workarea, command, config)
             dists = self._get_seq_distances(windowframe, seqs)
             currindex = sorted(dists)[0][1]
             nextindex = (currindex + 1) % len(seqs)
-            print('\nMove window %s to %s..' % (window.get_xid(), keypos['name']))
+            print('\nMove window %s to %s..' % (window.get_xid(), command))
             print('  config: xdivs={xdivs}, ydivs={ydivs}, minw={minwidth}, maxw={maxwidth}, '
                 'minh={minheight}, maxh={maxheight}, padding={padding}'.format(**config))
             print('  workarea: %s (monitorid:%s)' % (_rstr(workarea), monitorid))
@@ -125,6 +147,7 @@ class PyGrid(object):
                     userconfig = json.load(handle)
                     config.update(userconfig.get('default', {}))
                     config.update(userconfig.get('monitor%s' % monitorid, {}))
+                    config['keys'] = userconfig.get('keys', {})
             except Exception as err:
                 print('Unable to parse userconfig: %s; %s' % (CONFIG_PATH, err))
         else:
@@ -142,16 +165,16 @@ class PyGrid(object):
         workarea.height -= config['padding'][0] + config['padding'][2]
         return workarea
 
-    def _generate_sequence_percents(self, workarea, keypos, config):
+    def _generate_sequence_percents(self, workarea, command, config):
         """ Generate a list of sequence positions (as percents). """
         seqs = []
         for x1, x2 in product(_iter_percent(config['xdivs']), repeat=2):
             for y1, y2 in product(_iter_percent(config['ydivs']), repeat=2):
                 seqp = Seq(x1, x2, y1, y2, round(x2-x1,4), round(y2-y1,4))
                 if seqp.x1 >= seqp.x2 or seqp.y1 >= seqp.y2: continue
-                if not keypos['filter'](seqp): continue
-                if keypos['name'] not in ['top', 'middle', 'bottom'] and not config['minwidth'] <= seqp.w <= config['maxwidth']: continue
-                if keypos['name'] not in ['left', 'middle', 'right'] and not config['minheight'] <= seqp.h <= config['maxheight']: continue
+                if not self.FILTERS[command](seqp): continue
+                if command not in ['top', 'middle', 'bottom'] and not config['minwidth'] <= seqp.w <= config['maxwidth']: continue
+                if command not in ['left', 'middle', 'right'] and not config['minheight'] <= seqp.h <= config['maxheight']: continue
                 seqs.append(self._seqp_to_seq(seqp, workarea, config))
         return seqs
 
