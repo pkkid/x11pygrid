@@ -7,13 +7,12 @@ import copy, json, os, signal, socket
 from collections import namedtuple
 from itertools import product
 from Xlib import display, X
-from Xlib.keysymdef import miscellany
 
 try:
     # Create singleton using abstract socket (prefix with null)
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     sock.bind('\0pygrid_singleton_lock')
-except socket.error as err:
+except socket.error:
     raise SystemExit('PyGrid already running, exiting.')
 
 import gi
@@ -56,15 +55,15 @@ DEFAULT_CONFIG = {
 
 class PyGrid(object):
     FILTERS = {
-        'bottomleft' : lambda s: s.x1 == 0.0 and s.y2 == 1.0,
-        'bottom'     : lambda s: s.y2 == 1.0 and _center(s.x1,s.x2),
+        'bottomleft': lambda s: s.x1 == 0.0 and s.y2 == 1.0,
+        'bottom': lambda s: s.y2 == 1.0 and _center(s.x1,s.x2),
         'bottomright': lambda s: s.x2 == 1.0 and s.y2 == 1.0,
-        'left'       : lambda s: s.x1 == 0.0 and _center(s.y1,s.y2),
-        'middle'     : lambda s: _center(s.x1,s.x2) and _center(s.y1,s.y2),
-        'right'      : lambda s: s.x2 == 1.0 and _center(s.y1,s.y2),
-        'topleft'    : lambda s: s.x1 == 0.0 and s.y1 == 0.0,
-        'top'        : lambda s: s.y1 == 0.0 and _center(s.x1,s.x2),
-        'topright'   : lambda s: s.x2 == 1.0 and s.y1 == 0.0,
+        'left': lambda s: s.x1 == 0.0 and _center(s.y1,s.y2),
+        'middle': lambda s: _center(s.x1,s.x2) and _center(s.y1,s.y2),
+        'right': lambda s: s.x2 == 1.0 and _center(s.y1,s.y2),
+        'topleft': lambda s: s.x1 == 0.0 and s.y1 == 0.0,
+        'top': lambda s: s.y1 == 0.0 and _center(s.x1,s.x2),
+        'topright': lambda s: s.x2 == 1.0 and s.y1 == 0.0,
     }
 
     def __init__(self):
@@ -246,6 +245,7 @@ class PyGrid(object):
 
     def _maximize(self, window):
         window.maximize()
+
 
 def _center(p1, p2):
     return round(1.0 - p2, 4) == p1
