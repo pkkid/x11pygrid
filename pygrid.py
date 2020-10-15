@@ -248,7 +248,7 @@ class PyGrid(object):
 
 
 def _center(p1, p2):
-    return round(1.0 - p2, 4) == p1
+    return round(1.0 - p2, 4) == round(p1, 4)
 
 
 def _iter_percent(divs):
