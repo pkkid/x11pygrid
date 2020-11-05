@@ -64,6 +64,10 @@ class PyGrid(object):
         'topleft': lambda s: s.x1 == 0.0 and s.y1 == 0.0,
         'top': lambda s: s.y1 == 0.0 and _center(s.x1,s.x2),
         'topright': lambda s: s.x2 == 1.0 and s.y1 == 0.0,
+        'noclampleft': lambda s: s.x1 < 0.5,
+        'noclampright': lambda s: s.x2 > 0.5,
+        'noclamptop': lambda s: s.y1 < 0.5,
+        'noclampbottom': lambda s: s.y2 > 0.5,
     }
 
     def __init__(self):
@@ -125,7 +129,13 @@ class PyGrid(object):
             windowframe = window.get_frame_extents()
             config = self._get_config(monitorid)
             workarea = self._get_workarea(screen, monitorid, config)
-            seqs = self._generate_sequence_percents(workarea, command, config)
+            windowframep = Seq((windowframe.x - workarea.x) / workarea.width,
+                               (windowframe.x - workarea.x + windowframe.width) / workarea.width,
+                               (windowframe.y - workarea.y) / workarea.height,
+                               (windowframe.y - workarea.y + windowframe.height) / workarea.height,
+                               windowframe.width / workarea.width,
+                               windowframe.height / workarea.height)
+            seqs = self._generate_sequence_percents(workarea, command, config, windowframep)
             dists = self._get_seq_distances(windowframe, seqs)
             currindex = sorted(dists)[0][1]
             nextindex = (currindex + 1) % len(seqs)
@@ -175,16 +185,24 @@ class PyGrid(object):
         workarea.height -= config['padding'][0] + config['padding'][2]
         return workarea
 
-    def _generate_sequence_percents(self, workarea, command, config):
+    def _generate_sequence_percents(self, workarea, command, config, wfp):
         """ Generate a list of sequence positions (as percents). """
         seqs = []
-        for x1, x2 in product(_iter_percent(config['xdivs']), repeat=2):
-            for y1, y2 in product(_iter_percent(config['ydivs']), repeat=2):
+        xdivs = config['xdivs']
+        ydivs = config['ydivs']
+        for x1, x2 in product(_iter_percent(xdivs), repeat=2):
+            for y1, y2 in product(_iter_percent(ydivs), repeat=2):
                 seqp = Seq(x1, x2, y1, y2, round(x2-x1,4), round(y2-y1,4))
                 if seqp.x1 >= seqp.x2 or seqp.y1 >= seqp.y2: continue
                 if not self.FILTERS[command](seqp): continue
-                if command not in ['top', 'middle', 'bottom'] and not config['minwidth'] <= seqp.w <= config['maxwidth']: continue
-                if command not in ['left', 'middle', 'right'] and not config['minheight'] <= seqp.h <= config['maxheight']: continue
+                if command not in ['top', 'middle', 'bottom', 'noclamptop', 'noclampbottom'] \
+                    and not config['minwidth'] <= seqp.w <= config['maxwidth']: continue
+                if command not in ['left', 'middle', 'right', 'noclampleft', 'noclampright'] \
+                    and not config['minheight'] <= seqp.h <= config['maxheight']: continue
+                if command in ['noclampleft', 'noclampright'] \
+                    and not _closest(wfp.y1, wfp.y2, seqp.y1, seqp.y2, ydivs): continue
+                if command in ['noclamptop', 'noclampbottom'] \
+                    and not _closest(wfp.x1, wfp.x2, seqp.x1, seqp.x2, xdivs): continue
                 seqs.append(self._seqp_to_seq(seqp, workarea, config))
         return seqs
 
@@ -249,6 +267,12 @@ class PyGrid(object):
 
 def _center(p1, p2):
     return round(1.0 - p2, 4) == round(p1, 4)
+
+
+def _closest(p1, p2, actualp1, actualp2, divs):
+    """ Determines if a sequence position is the closest possible sequence position
+        (for a given number of divisions) to an actual position (all as percents). """
+    return abs(p1 - actualp1) < (1 / (2*divs)) and abs(p2 - actualp2) < (1 / (2*divs))
 
 
 def _iter_percent(divs):
