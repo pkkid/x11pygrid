@@ -17,7 +17,7 @@ except socket.error:
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GObject  # noqa
+from gi.repository import Gtk, GLib  # noqa
 from gi.repository import Gdk  # noqa
 
 Seq = namedtuple('Seq', ['x1','x2', 'y1', 'y2', 'w', 'h'])
@@ -78,7 +78,7 @@ class PyGrid(object):
         self._bind_keys()
         for event in range(0, self.root.display.pending_events()):
             self.root.display.next_event()
-        GObject.io_add_watch(self.root.display, GObject.IO_IN, self._check_event)
+        GLib.io_add_watch(self.root.display, GLib.IO_IN, self._check_event)
         print('PyGrid running. Press CTRL+C to cancel.')
         Gtk.main()
 
