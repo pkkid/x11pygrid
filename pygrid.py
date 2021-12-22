@@ -48,6 +48,7 @@ DEFAULT_CONFIG = {
             'KP_9': 'topright',
             'KP_0': 'maximize',
             'KP_Enter': 'cycle-monitor',
+            'KP_Divide': 'max-stretch',
         }
     }
 }
@@ -114,6 +115,9 @@ class PyGrid(object):
                 return
             if command == 'cycle-monitor':
                 self._cycle_monitor(screen, window)
+                return
+            if command == 'max-stretch':
+                self._max_stretch(window)
                 return
 
             if self._get_config()['snaptocursor']:
@@ -245,6 +249,18 @@ class PyGrid(object):
 
     def _maximize(self, window):
         window.maximize()
+
+    def _max_stretch(self, window):
+        seq = Seq(
+            x1=0,
+            x2=int(Gdk.Screen.width()),
+            y1=0,
+            y2=int(Gdk.Screen.height()),
+            w=int(Gdk.Screen.width()),
+            h=int(Gdk.Screen.height()),
+        )
+        print('\nMove window %s to max-stretch..' % (window.get_xid()))
+        self._move_window(window, seq)
 
 
 def _center(p1, p2):
