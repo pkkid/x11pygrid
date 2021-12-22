@@ -70,6 +70,21 @@ require you to restart PyGrid.
 }
 ```
 
+##### Available Commands #####
+* `bottomleft` - cycle window sizes which touch both bottom and left screen edges.
+* `bottom` - cycle window sizes which touch the bottom screen edge and are centered horizontally.
+* `bottomright` - cycle window sizes which touch both bottom and right screen edges.
+* `left` - cycle window sizes which touch the left screen edge and are centered vertically.
+* `middle` - cycle window sizes which are centered both horizontally and vertically.
+* `right` - cycle window sizes which touch the right screen edge and are centered vertically.
+* `topleft` - cycle window sizes which touch both top and left screen edges.
+* `top` - cycle window sizes which touch the top screen edge and are centered horizontally.
+* `topright` - cycle window sizes which touch both top and right screen edges.
+* `noclampleft` - cycle window sizes on the left of the screen with the same vertical size.
+* `noclampright` - cycle window sizes on the right of the screen with the same vertical size.
+* `noclamptop` - cycle window sizes at the top of the screen with the same horizontal size.
+* `noclampbottom` - cycle window sizes at the bottom of the screen with the same horizontal size.
+
 #### Installation on Ubuntu ####
 ```bash
 $ sudo apt-get install git python3-gi python3-xlib
