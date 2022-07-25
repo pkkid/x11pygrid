@@ -7,11 +7,19 @@ import copy, json, os, signal, socket
 from collections import namedtuple
 from itertools import product
 from Xlib import display, X
+import platform
 
 try:
     # Create singleton using abstract socket (prefix with null)
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    sock.bind('\0pygrid_singleton_lock')
+
+    # OS distinction
+    # FreeBSD (and probably other BSDs) doesn't work with the '\0', while Linux needs it to work.
+    if 'BSD' in platform.system().upper():
+        sock.bind('pygrid_singleton_lock')
+    else:
+        sock.bind('\0pygrid_singleton_lock')
+
 except socket.error:
     raise SystemExit('PyGrid already running, exiting.')
 
