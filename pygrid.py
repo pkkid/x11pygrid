@@ -8,12 +8,9 @@ from collections import namedtuple
 from itertools import product
 from Xlib import display, X
 
-try:
-    # Create singleton using abstract socket (prefix with null)
-    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    sock.bind('\0pygrid_singleton_lock')
-except socket.error:
-    raise SystemExit('PyGrid already running, exiting.')
+# Oneliner that protects user from trying to run second PyGrid instance.
+# Works with Linux and FreeBSD (maybe all BSDs) as well.
+import single_process.init
 
 import gi
 gi.require_version('Gtk', '3.0')
