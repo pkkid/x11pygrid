@@ -9,6 +9,7 @@ real estate. It's easy to configure and supports multiple monitors.
 * X11-based desktop
 * python3-gi
 * python3-xlib
+* single_process
 
 #### Default Shortcuts ####
 * `ALT`+`CTRL`+`NUMPAD-1` - Move window to bottom left.
