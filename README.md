@@ -102,6 +102,6 @@ To start at boot I simply added the following line to *Startup Applications*.
 
 
 #### Credit & License ####
-PyGrid was original a fork of [QuickTile by ssokolow](https://github.com/ssokolow/quicktile),
+PyGrid was originally a fork of [QuickTile by ssokolow](https://github.com/ssokolow/quicktile),
 but rewritten to allow a much easier configuration as well as updated code to
 run on Python3 & GTK3. Code released under GPLv2 License.
