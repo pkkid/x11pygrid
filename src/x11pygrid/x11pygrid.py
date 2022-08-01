@@ -3,21 +3,21 @@
 PyGrid - M.Shepanski 2016
 Easily organize open windows on X11 desktop.
 """
-import copy, json, os, signal, socket
+import copy, json, os, signal
 from collections import namedtuple
 from itertools import product
 from Xlib import display, X
 
 # Oneliner that protects user from trying to run second PyGrid instance.
 # Works with Linux and FreeBSD (maybe all BSDs) as well.
-import single_process.init
+import single_process.init  # noqa
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib  # noqa
 from gi.repository import Gdk  # noqa
 
-Seq = namedtuple('Seq', ['x1','x2', 'y1', 'y2', 'w', 'h'])
+Seq = namedtuple('Seq', ['x1', 'x2', 'y1', 'y2', 'w', 'h'])
 CONFIG_PATH = os.path.expanduser('~/.config/pygrid.json')
 DEFAULT_CONFIG = {
     'default': {
@@ -297,6 +297,10 @@ def _rstr(rect):
     return 'x=%s y=%s w=%s h=%s' % (rect.x, rect.y, rect.width, rect.height)
 
 
-if __name__ == '__main__':
+def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     PyGrid().start()
+
+
+if __name__ == '__main__':
+    main()
