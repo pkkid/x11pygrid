@@ -90,7 +90,7 @@ require you to restart PyGrid.
 ```bash
 $ sudo apt-get install git python3-gi python3-xlib
 $ cd <place-you-want-to-store-pygrid>
-$ git clone https://github.com/mjs7231/pygrid.git
+$ git clone https://github.com/pkkid/x11pygrid.git
 $ cd pygrid && ./pygrid.py
 ```
 
