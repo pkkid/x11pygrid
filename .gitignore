@@ -1,0 +1,5 @@
+.mypy_cache/*
+build/*
+dist/*
+src/x11pygrid.egg-info/*
+.vscode/*

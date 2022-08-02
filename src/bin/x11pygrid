@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+
+import x11pygrid  # noqa
+
+x11pygrid.main()
