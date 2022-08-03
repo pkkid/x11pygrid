@@ -43,7 +43,8 @@ setuptools.setup(
         "Xlib",
         "single_process",
         "PyGObject",  # this is "gi" requirement
-        "pycairo",  # this is "gi" requirement
+        #  pycairo was problematic for pipx. Luckily it may be redundant... is it?
+        # "pycairo",  # this is "gi" requirement
     ],
     scripts=['src/bin/x11pygrid'],
 )
