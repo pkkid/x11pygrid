@@ -1,5 +1,5 @@
-## PyGrid ##
-<img align='right' width='500' src='https://raw.githubusercontent.com/pkkid/pygrid/master/example.gif'/>
+## x11PyGrid ##
+<img align='right' width='500' src='https://raw.githubusercontent.com/pkkid/x11pygrid/master/example.gif'/>
 PyGrid is a small utility which allows you to easily organize your open windows
 by tiling, resizing and positioning them to make the best use of your desktop
 real estate. It's easy to configure and supports multiple monitors.
@@ -90,13 +90,13 @@ require you to restart PyGrid.
 ```bash
 $ sudo apt-get install git python3-gi python3-xlib
 $ cd <place-you-want-to-store-pygrid>
-$ git clone https://github.com/mjs7231/pygrid.git
+$ git clone https://github.com/pkkid/x11pygrid.git
 $ cd pygrid && ./pygrid.py
 ```
 
 To start at boot I simply added the following line to *Startup Applications*.
 ```bash
-/usr/bin/python3 <full-path>/pygrid/pygrid.py
+/usr/bin/python3 <full-path>/x11pygrid/x11pygrid.py
 ```
  
 
