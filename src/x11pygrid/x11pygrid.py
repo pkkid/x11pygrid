@@ -18,7 +18,7 @@ from gi.repository import Gtk, GLib  # noqa
 from gi.repository import Gdk  # noqa
 
 Seq = namedtuple('Seq', ['x1', 'x2', 'y1', 'y2', 'w', 'h'])
-CONFIG_PATH = os.path.expanduser('~/.config/pygrid.json')
+CONFIG_PATH = os.path.expanduser('~/.config/x11pygrid.json')
 DEFAULT_CONFIG = {
     'default': {
         'snaptocursor': False,      # window will be moved to cursor's monitor
