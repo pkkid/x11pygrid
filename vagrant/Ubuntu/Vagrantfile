@@ -1,0 +1,26 @@
+
+Vagrant.configure("2") do |config|
+
+    config.vm.box = "mhc-cs/Ubuntu-20-04-Xfce"
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.name = "x11pygrid_Ubuntu"
+        vb.gui = true
+        vb.customize ["modifyvm", :id, "--vram", "128"]
+        vb.memory = "2048"  # more than needed, less than we can handle ;)
+        vb.cpus = 4  # as above... I hope.
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt update
+
+        # normally pipx is installed without venv and pip, which is (in our case) obvious dependency
+        apt install -y pipx python3-venv python3-pip
+
+        # needed by pipx to install x11pygrid
+        apt install -y libcairo2-dev pkg-config python3-dev libgirepository1.0-dev
+
+        # add ~/.local/bin to PATH
+        echo -e "\nPATH=\\$PATH:/home/vagrant/.local/bin\nexport PATH" >> /home/vagrant/.bashrc
+    SHELL
+    end

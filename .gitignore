@@ -3,3 +3,4 @@ build/*
 dist/*
 src/x11pygrid.egg-info/*
 .vscode/*
+vagrant/*/.vagrant

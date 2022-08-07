@@ -1,0 +1,23 @@
+
+Vagrant.configure("2") do |config|
+
+    config.vm.box = "freebsd/FreeBSD-13.1-STABLE"
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.name = "x11pygrid_FreeBSD"
+        vb.gui = true
+        vb.customize ["modifyvm", :id, "--vram", "128"]
+        vb.memory = "2048"  # more than needed, less than we can handle ;)
+        vb.cpus = 4  # as above... I hope.
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        pkg install -y xorg xfce  emulators/virtualbox-ose-additions
+        sysrc moused_enable=YES dbus_enable=YES hald_enable=YES vboxguest_enable=YES vboxservice_enable=YES
+        pkg install -y py39-pip py39-virtualenv py39-pipx
+        pkg install -y devel/pkgconf  # This is the ONLY needed package for pipx
+        echo "exec startxfce4" > /home/vagrant/.xinitrc
+        chsh -s /usr/local/bin/bash vagrant  # In other words - everything but not csh. We all know bash, so it's ok, right?
+        echo -e "\nPATH=\\$PATH:/home/vagrant/.local/bin\nexport PATH" >> /home/vagrant/.bashrc
+    SHELL
+end
