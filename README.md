@@ -1,17 +1,21 @@
-## x11PyGrid ##
+# x11PyGrid #
 <img align='right' width='500' src='https://raw.githubusercontent.com/pkkid/x11pygrid/master/example.gif'/>
-PyGrid is a small utility which allows you to easily organize your open windows
+x11pygrid is a small utility which allows you to easily organize your open windows
 by tiling, resizing and positioning them to make the best use of your desktop
 real estate. It's easy to configure and supports multiple monitors.
 
-#### Requirements ####
+#####
+_Notice that, package is renamed from pygrid to x11pygrid._
+_Previous name was too similar to the other package in PyPi._
+
+### Requirements ###
 * Python3
 * X11-based desktop
 * python3-gi
 * python3-xlib
 * single_process
 
-#### Default Shortcuts ####
+### Default Shortcuts ###
 * `ALT`+`CTRL`+`NUMPAD-1` - Move window to bottom left.
 * `ALT`+`CTRL`+`NUMPAD-2` - Move window to bottom.
 * `ALT`+`CTRL`+`NUMPAD-3` - Move window to bottom right.
@@ -27,10 +31,16 @@ real estate. It's easy to configure and supports multiple monitors.
 Repeatedly press one of the defined keybindings to cycle through window sizes
 available at the desired location on the screen.
 
-#### Configuration ####
-Configuration is done via a JSON file located at `~/.config/pygrid.json` which
-will be created with default options if not found when starting up. The default
-configuration is below. If you introduce top level sections `'monitor0': {...}`
+### Configuration ###
+Configuration is done via a JSON file located at `~/.config/x11pygrid.json`,
+which will be created with default options if not found when starting up.
+
+If you have old, customized configuration file, named by old package name
+(i.e. in `~/.config/pygrid.json` instead of `~/.config/x11pygrid.json`),
+you can just `mv ~/.config/pygrid.json ~/.config/x11pygrid.json`.
+
+
+The default configuration is below. If you introduce top level sections `'monitor0': {...}`
 or `'monitor1': {...}` to provide different options for each monitor on your
 system.  Any settings not defined will fall back to user-defined defaults, then
 global defaults. NOTE: Updating configuration in this JSON file does *not*
@@ -71,7 +81,7 @@ require you to restart PyGrid.
 }
 ```
 
-##### Available Commands #####
+#### Available Commands ####
 * `bottomleft` - cycle window sizes which touch both bottom and left screen edges.
 * `bottom` - cycle window sizes which touch the bottom screen edge and are centered horizontally.
 * `bottomright` - cycle window sizes which touch both bottom and right screen edges.
@@ -86,22 +96,84 @@ require you to restart PyGrid.
 * `noclamptop` - cycle window sizes at the top of the screen with the same horizontal size.
 * `noclampbottom` - cycle window sizes at the bottom of the screen with the same horizontal size.
 
-#### Installation on Ubuntu ####
+### Installation ###
+
+#### pip ####
+The simpliest method, just oneliner:
 ```bash
-$ sudo apt-get install git python3-gi python3-xlib
-$ cd <place-you-want-to-store-pygrid>
-$ git clone https://github.com/pkkid/x11pygrid.git
-$ cd pygrid && ./pygrid.py
+pip install --user x11pygrid
 ```
 
-To start at boot I simply added the following line to *Startup Applications*.
+#### pipx ####
+Isolated environments maintained by ```pipx``` are great, but not always totally free.
+According to the [Pycairo's documentation](https://pycairo.readthedocs.io/en/latest/getting_started.html), before installing pycairo, you need to provide few
+packages (dependencies): pkg-config and cairo with it's headers. (Indeed, it's a bit paradoxical.)
+
+Obviously, you also need python3-pip, python3-venv and pipx itself. Unfortunately(?), they are not marked
+as dependencies of pipx, so you may need to install it first. More about that in the [pipx's documentation](https://pypa.github.io/pipx/troubleshooting/).
+Now let's assume you have already installed fully operational pipx.
+
+So, before you execute universal:
 ```bash
-/usr/bin/python3 <full-path>/x11pygrid/x11pygrid.py
+pipx install x11pygrid
 ```
- 
+you need to install dependencies. Obviously – with corresponding to your distro packages manager.
+- ##### Ubuntu / Debian #####
+  ```bash
+  sudo apt install libcairo2-dev pkg-config python3-dev
+  pipx install x11pygrid
+  ```
+
+- ##### Arch Linux #####
+  ```bash
+  sudo pacman -S cairo pkgconf
+  pipx install x11pygrid
+  ```
+
+- ##### Fedora #####
+  ```bash
+  sudo dnf install cairo-devel pkg-config python3-devel
+  pipx install x11pygrid
+  ```
+
+- ##### openSUSE #####
+  ```bash
+  sudo zypper install cairo-devel pkg-config python3-devel
+  pipx install x11pygrid
+  ```
+
+- ##### FreeBSD #####
+  ```bash
+  sudo pkg install -y devel/pkgconf
+  pipx install x11pygrid
+  ```
+  you can also install pkgconf from ports:
+  ```bash
+  cd /usr/ports/devel/pkgconf/
+  sudo make install clean
+  pipx install x11pygrid
+  ```
+
+#### From source ####
+The only file you really need to install is `x11pygrid.py`, which you can place anywhere you want.
+For example:
+```bash
+mkdir -p ~/.local/bin/
+cd ~/.local/bin/
+wget https://raw.githubusercontent.com/pkkid/x11pygrid/master/src/x11pygrid/x11pygrid.py
+mv x11pygrid.py x11pygrid
+chmod +x x11pygrid
+```
+Also you should check if choosen directory is in `echo $PATH` and install dependencies by hand.
+Because of that and many other reasons, the best solution is `pipx` or at least `pip`.
+
+### Autostart ###
+It is propably the most natural to just add `x11pygrid` to the _Startup Applications_ aka _Autostart_.
+Depending on distro and window manager, it can be done in many ways.
+It is not recomended to do it by `cron`, because it's X11-dependent.
 
 
-#### Credit & License ####
+### Credit & License ###
 PyGrid was originally a fork of [QuickTile by ssokolow](https://github.com/ssokolow/quicktile),
 but rewritten to allow a much easier configuration as well as updated code to
 run on Python3 & GTK3. Code released under GPLv2 License.
