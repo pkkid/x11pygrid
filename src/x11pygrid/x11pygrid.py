@@ -95,15 +95,18 @@ class PyGrid(object):
             self.keys[keycode] = command
             self.root.grab_key(keycode, modmask, 1, X.GrabModeAsync, X.GrabModeAsync)
 
-    def _check_event(self, source, condition, handle=None):
-        """ Check keyboard event has all the right buttons pressed. """
-        handle = handle or self.root.display
-        for _ in range(0, handle.pending_events()):
-            event = handle.next_event()
-            if event.type == X.KeyPress:
-                command = self.keys[event.detail]
-                self._handle_event(command)
-        return True
+    def _check_event(self, source, condition, handle=None):        
+            """ Check keyboard event has all the right buttons pressed. """
+            handle = handle or self.root.display
+            for _ in range(0, handle.pending_events()):
+                event = handle.next_event()
+                if event.type == X.KeyPress:                    
+                    # fix error with wikey+alt
+                    if not event.detail in self.keys:                    
+                        return True
+                    command = self.keys[event.detail]
+                    self._handle_event(command)
+            return True
 
     def _handle_event(self, command):
         try:
