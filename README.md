@@ -122,9 +122,6 @@ The whole program is the single file [`src/x11pygrid/x11pygrid.py`](https://gith
 
 ```bash
 pipx upgrade x11pygrid
-```
-
-```bash
 pipx uninstall x11pygrid
 ```
 
