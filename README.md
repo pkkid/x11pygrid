@@ -54,8 +54,7 @@ If your shell says `x11pygrid: command not found`, run `pipx ensurepath` and ope
 
 PyGObject is awkward to compile from PyPI, so the easiest route is to install it from your package manager and let pipx reuse it with `--system-site-packages`. No compilers or `-dev` packages needed.
 
-<details>
-<summary>Packages per distro</summary>
+Install PyGObject and pipx for your system:
 
 ```bash
 # Ubuntu / Debian
@@ -73,7 +72,6 @@ sudo zypper install python3-pipx python3-gobject python3-gobject-Gdk typelib-1_0
 # FreeBSD (replace py311 with the prefix of your default Python version)
 sudo pkg install py311-pipx py311-gobject3 gtk3
 ```
-</details>
 
 Then install x11pygrid:
 
@@ -329,19 +327,6 @@ x11pygrid already respects the work area your window manager reports. If a panel
 "default": { "padding": [32, 0, 0, 0] }
 ```
 </details>
-
-## How It Works
-
-```mermaid
-flowchart LR
-    A[Ctrl+Alt+Num key] --> B[Look up command<br/>for that key]
-    B --> C[Read config for the<br/>window's monitor]
-    C --> D[Build every grid rectangle<br/>that fits the command and<br/>min/max limits]
-    D --> E[Find the rectangle closest<br/>to the window right now]
-    E --> F[Move the window to<br/>the next one in the list]
-```
-
-At startup x11pygrid grabs each configured key combination on the X root window, then waits in a GTK main loop. When a shortcut fires, it divides the monitor's work area into `xdivs` × `ydivs` cells and lists every rectangle that touches the edges the command asks for and fits the min/max limits. It works out which of those the active window currently matches most closely and moves it to the next one. That's why pressing the same key repeatedly cycles through sizes, and why the size you get on the first press depends on the window's current shape.
 
 ## Troubleshooting
 
