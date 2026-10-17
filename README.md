@@ -12,108 +12,61 @@ Floating window managers leave you dragging window edges around by hand, and swi
 
 ## Features
 
-- **One keystroke per position**: the 3×3 numpad maps directly onto the screen, so <kbd>7</kbd> is top left and <kbd>3</kbd> is bottom right.
+- **One keystroke per position**: the 3×3 numpad maps directly onto the screen.
 - **Press again to cycle sizes**: tap <kbd>4</kbd> to snap left, then tap again to switch between ⅓ and ⅔ width.
-- **Your grid, your rules**: choose the number of columns and rows, min and max window sizes, padding and spacing between windows.
-- **Multi-monitor aware**: per-monitor settings, a key to send a window to the next monitor, and a key to stretch it across all of them.
-- **Edits apply instantly**: layout settings are re-read on every keypress, so there is nothing to restart while you tweak.
-- **Fits any keyboard**: rebind to number-row keys, letters, or any other modifier if you don't have a numpad.
-- **Tiny and unobtrusive**: a single Python file that runs in the background on Linux and FreeBSD.
+- **Your grid, your rules**: choose the number of columns, and padding between windows.
+- **Multi-monitor aware**: per-monitor settings, a key to send a window to the next monitor.
+- **Edits apply instantly**: layout and config settings are re-read on every keypress.
+- **Fits any keyboard**: rebind to number-row keys, letters, or any other modifier.
+- **Tiny and unobtrusive**: a single Python file that runs in the background.
 
 ## Quick Start
 
 On Ubuntu or Debian, in an X11 session:
 
 ```bash
-sudo apt install pipx python3-gi gir1.2-gtk-3.0
-pipx install --system-site-packages x11pygrid
-x11pygrid
+sudo apt install pipx python3-gi gir1.2-gtk-3.0  # Install dependancies
+pipx install --system-site-packages x11pygrid    # Install PyGrid
+x11pygrid                                        # Run PyGrid
 ```
 
-You should see:
-
-```text
-Writing default config: /home/you/.config/x11pygrid.json
-PyGrid running. Press CTRL+C to cancel.
-```
-
-Now make sure <kbd>Num Lock</kbd> is on, click any window, and press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Num 4</kbd>. The window snaps to the left edge of the screen; press it again to switch between ⅓ and ⅔ width.
-
-If your shell says `x11pygrid: command not found`, run `pipx ensurepath` and open a new terminal. Other distributions are covered under [Installation](#installation).
+Make sure <kbd>Num Lock</kbd> is on, click any window, and press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Num 4</kbd>. The window snaps to the left edge of the screen; press it again to switch between ⅓ and ⅔ width.
 
 ## Installation
 
 ### Requirements
 
-- An **X11 session**. Wayland is not supported; `echo $XDG_SESSION_TYPE` should print `x11`.
-- A window manager that supports the EWMH `_NET_ACTIVE_WINDOW` hint (nearly all of them do).
-- **Python 3.6+** with **PyGObject** and **GTK 3**.
-- Linux or FreeBSD.
-
-### Recommended: pipx with your distro's PyGObject
-
-PyGObject is awkward to compile from PyPI, so the easiest route is to install it from your package manager and let pipx reuse it with `--system-site-packages`. No compilers or `-dev` packages needed.
-
-Install PyGObject and pipx for your system:
+1.  An **X11 session**. Wayland is not supported; `echo $XDG_SESSION_TYPE` should print `x11`.
+2. **Python 3.6+** with **PyGObject** and **GTK 3**.
 
 ```bash
 # Ubuntu / Debian
 sudo apt install pipx python3-gi gir1.2-gtk-3.0
+pipx install --system-site-packages x11pygrid
 
 # Fedora
 sudo dnf install pipx python3-gobject gtk3
+pipx install --system-site-packages x11pygrid
 
 # Arch Linux
 sudo pacman -S python-pipx python-gobject gtk3
+pipx install --system-site-packages x11pygrid
 
 # openSUSE
 sudo zypper install python3-pipx python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-3_0
+pipx install --system-site-packages x11pygrid
 
 # FreeBSD (replace py311 with the prefix of your default Python version)
 sudo pkg install py311-pipx py311-gobject3 gtk3
-```
-
-Then install x11pygrid:
-
-```bash
 pipx install --system-site-packages x11pygrid
-```
-
-### Alternative: pipx, building PyGObject from source
-
-If you'd rather have a fully isolated environment, pipx can build PyGObject itself. That needs the cairo and gobject-introspection headers plus a compiler toolchain.
-
-<details>
-<summary>Build dependencies per distro</summary>
-
-```bash
-# Ubuntu / Debian (use libgirepository1.0-dev on releases older than 24.04)
-sudo apt install pipx libcairo2-dev libgirepository-2.0-dev pkg-config python3-dev
-
-# Fedora
-sudo dnf install pipx cairo-devel gobject-introspection-devel pkgconf python3-devel
-
-# Arch Linux
-sudo pacman -S python-pipx cairo gobject-introspection pkgconf
-
-# openSUSE
-sudo zypper install python3-pipx cairo-devel gobject-introspection-devel pkg-config python3-devel
-
-# FreeBSD
-sudo pkg install py311-pipx cairo gobject-introspection pkgconf
-```
-</details>
-
-```bash
-pipx install x11pygrid
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/pkkid/x11pygrid.git
-cd x11pygrid
-pipx install --system-site-packages .
+git clone https://github.com/pkkid/x11pygrid.git    # Clone the repo
+cd x11pygrid                                        # Navigate into the dir
+pipx install --system-site-packages .               # Install packages
 ```
 
 The whole program is the single file [`src/x11pygrid/x11pygrid.py`](https://github.com/pkkid/x11pygrid/blob/master/src/x11pygrid/x11pygrid.py). You can also run it directly with `python3` as long as `gi`, `Xlib` and `single_process` are importable.
@@ -121,8 +74,8 @@ The whole program is the single file [`src/x11pygrid/x11pygrid.py`](https://gith
 ### Upgrade and uninstall
 
 ```bash
-pipx upgrade x11pygrid
-pipx uninstall x11pygrid
+pipx upgrade x11pygrid      # Upgrade
+pipx uninstall x11pygrid    # Uninstall
 ```
 
 Uninstalling leaves your config at `~/.config/x11pygrid.json`; delete it if you don't want it.
